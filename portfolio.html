@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Supreme Commerce</title>
+<link rel="icon" type="image/png" href="assets/images/logo-transparent.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,450;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=20260719a">
+<style>
+/* ---- Per-category accent colors — same mapping used for these channels on services.html ---- */
+.portfolio-card[data-cat="walmart"]{--port-accent:#F0B84A;}
+.portfolio-card[data-cat="facebook"]{--port-accent:#7FA8FF;}
+.portfolio-card[data-cat="tiktok"]{--port-accent:#3FE0C8;}
+.portfolio-card[data-cat="shopify"]{--port-accent:var(--brass-bright);}
+.portfolio-card[data-cat="web"]{--port-accent:#7FD1FF;}
+.portfolio-card[data-cat="seo"]{--port-accent:var(--signal);}
+.portfolio-card[data-cat="social"]{--port-accent:#FF9EC1;}
+
+.filter-chip[data-filter="walmart"]{--chip-accent:#F0B84A;}
+.filter-chip[data-filter="facebook"]{--chip-accent:#7FA8FF;}
+.filter-chip[data-filter="tiktok"]{--chip-accent:#3FE0C8;}
+.filter-chip[data-filter="shopify"]{--chip-accent:var(--brass-bright);}
+.filter-chip[data-filter="web"]{--chip-accent:#7FD1FF;}
+.filter-chip[data-filter="seo"]{--chip-accent:var(--signal);}
+.filter-chip[data-filter="social"]{--chip-accent:#FF9EC1;}
+
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:48px;}
+.filter-chip{
+  font-family:var(--font-mono);font-size:12.5px;padding:9px 16px;border-radius:100px;
+  border:1px solid var(--line);color:var(--slate);cursor:pointer;transition:all .25s ease;background:transparent;
+}
+.filter-chip:hover{border-color:var(--chip-accent,var(--brass));color:var(--porcelain);}
+.filter-chip.active{
+  background:var(--chip-accent,var(--brass));border-color:var(--chip-accent,var(--brass));
+  color:var(--ink);font-weight:700;box-shadow:0 10px 26px -10px var(--chip-accent,var(--brass));
+}
+
+/* ---- Glassmorphism portfolio cards — same recipe as insight-card / carousel-3d-card ---- */
+.portfolio-card{
+  transition:opacity .3s ease, transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;
+  position:relative;border-radius:18px;overflow:hidden;aspect-ratio:4/5;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.12);
+}
+.portfolio-card.hidden{display:none;}
+.portfolio-card::after{
+  content:'';position:absolute;inset:0;border-radius:18px;pointer-events:none;z-index:2;
+  box-shadow:0 0 0 1px var(--port-accent,var(--brass-bright)) inset;
+  opacity:0;transition:opacity .35s ease;
+}
+.portfolio-card:hover{transform:translateY(-6px);box-shadow:0 30px 60px -18px rgba(0,0,0,0.55), 0 0 40px -14px var(--port-accent,var(--brass-bright));}
+.portfolio-card:hover::after{opacity:0.9;}
+.portfolio-card img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.8,.2,1);}
+.portfolio-card:hover img{transform:scale(1.08);}
+.portfolio-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(0deg, rgba(11,15,20,0.94) 0%, rgba(11,15,20,0.15) 60%, transparent 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;padding:26px;
+}
+.portfolio-overlay .cat{
+  font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:0.04em;
+  color:var(--ink);background:var(--port-accent,var(--brass-bright));
+  display:inline-flex;padding:6px 13px;border-radius:100px;margin-bottom:12px;
+  box-shadow:0 0 16px -2px var(--port-accent,var(--brass-bright));width:fit-content;
+}
+.portfolio-overlay h4{font-family:var(--font-display);font-size:19px;font-weight:600;line-height:1.3;}
+.portfolio-card.wide{grid-column:span 2;}
+
+/* ---- Click-to-zoom lightbox — same component as the homepage "Recent Work" carousel ---- */
+.focus-lightbox{
+  /* !important: this is a direct child of <body> on this page, so it hits
+     the same specificity trap as nav/.nav-scrim (see style.css) — without
+     it the generic body>* rule demotes this to position:relative;z-index:2. */
+  position:fixed !important;inset:0;z-index:300 !important;display:flex;align-items:center;justify-content:center;
+  padding:32px;visibility:hidden;pointer-events:none;
+}
+.focus-lightbox.open{visibility:visible;pointer-events:auto;}
+.focus-lightbox-backdrop{
+  position:absolute;inset:0;background:rgba(6,8,11,0);backdrop-filter:blur(0px);
+  transition:background 0.4s ease, backdrop-filter 0.4s ease;
+}
+.focus-lightbox.open .focus-lightbox-backdrop{background:rgba(6,8,11,0.88);backdrop-filter:blur(6px);}
+.focus-lightbox-card{
+  position:relative;width:min(680px,100%);max-height:86vh;overflow:hidden;
+  border-radius:22px;background:rgba(255,255,255,0.05);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:0 60px 120px -20px rgba(0,0,0,0.7), 0 0 60px -10px var(--neon,#C98D8A);
+  transform:scale(0.5);opacity:0;
+  transition:transform 0.45s cubic-bezier(.2,.8,.2,1), opacity 0.35s ease;
+}
+.focus-lightbox.open .focus-lightbox-card{transform:scale(1);opacity:1;}
+.focus-lightbox-img{width:100%;height:52vh;background-size:cover;background-position:center;}
+.focus-lightbox-content{padding:30px 34px 34px;}
+.focus-lightbox-content h3{font-family:var(--font-display);font-size:24px;font-weight:700;color:#fff;line-height:1.3;}
+.focus-lightbox-tag{
+  font-family:var(--font-mono);font-size:11px;font-weight:700;padding:6px 13px;border-radius:100px;
+  display:inline-block;margin-bottom:14px;
+}
+.focus-lightbox-close{
+  position:absolute;top:16px;right:16px;z-index:3;width:38px;height:38px;border-radius:50%;
+  background:rgba(6,8,11,0.7);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.15);
+  color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background 0.25s ease, transform 0.25s ease;
+}
+.focus-lightbox-close:hover{background:var(--brass);transform:scale(1.08);}
+@media(max-width:640px){
+  .focus-lightbox{padding:16px;}
+  .focus-lightbox-img{height:38vh;}
+  .focus-lightbox-content{padding:22px 22px 26px;}
+}
+
+/* ---- Case study: same drifting dual-glow treatment used behind the about-page stats ---- */
+.stats-section{position:relative;overflow:hidden;}
+.stats-glow{position:absolute;inset:0;pointer-events:none;z-index:0;}
+.stats-glow::before, .stats-glow::after{
+  content:'';position:absolute;border-radius:50%;filter:blur(60px);
+}
+.stats-glow::before{
+  width:560px;height:560px;top:-200px;right:-140px;
+  background:radial-gradient(circle, rgba(216,120,120,0.4), transparent 68%);
+  animation:statsGlowDrift1 10s ease-in-out infinite;
+}
+.stats-glow::after{
+  width:480px;height:480px;bottom:-180px;left:-110px;
+  background:radial-gradient(circle, rgba(63,224,200,0.32), transparent 68%);
+  animation:statsGlowDrift2 12s ease-in-out infinite;
+}
+@keyframes statsGlowDrift1{
+  0%,100%{transform:translate(0,0) scale(1);opacity:1;}
+  50%{transform:translate(-60px,70px) scale(1.25);opacity:0.7;}
+}
+@keyframes statsGlowDrift2{
+  0%,100%{transform:translate(0,0) scale(1);opacity:0.9;}
+  50%{transform:translate(70px,-60px) scale(1.2);opacity:0.6;}
+}
+.stats-section .wrap{position:relative;z-index:1;}
+@media(prefers-reduced-motion: reduce){
+  .stats-glow::before, .stats-glow::after{animation:none;}
+}
+
+/* ---- Fixed page-wide background video, same as index/about/contact ---- */
+.page-bg-video{
+  position:fixed !important;inset:0;width:100%;height:100%;object-fit:cover;
+  z-index:0 !important;pointer-events:none;
+}
+.page-bg-overlay{
+  position:fixed !important;inset:0;z-index:1 !important;pointer-events:none;
+  background:linear-gradient(180deg, rgba(6,8,11,0.86) 0%, rgba(6,8,11,0.74) 40%, rgba(6,8,11,0.9) 100%);
+}
+.section-light{background:transparent !important;color:var(--porcelain) !important;}
+.section-light .sec-head p{color:var(--slate) !important;}
+body{background:transparent;}
+
+/* ---- CTA + footer background, same shared image treatment as services.html ---- */
+.cta-footer-bg{
+  position:relative;
+  background-image:url('assets/images/cta-footer-bg.png');
+  background-size:cover;background-position:center right;background-repeat:no-repeat;
+  background-attachment:fixed;
+}
+.cta-footer-bg::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg, rgba(6,2,3,0.55) 0%, rgba(6,2,3,0.75) 100%);
+}
+.cta-footer-bg .wrap{position:relative;z-index:1;}
+#ctaFadeSection .final-cta{
+  background:rgba(255,255,255,0.04);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,0.14);
+}
+#ctaFadeSection .final-cta::before{display:none;}
+@media(max-width:900px){.cta-footer-bg{background-attachment:scroll;}}
+
+/* ---- Bigger, bolder text pass — matches about/services/contact ---- */
+.page-hero h1{font-size:clamp(38px,5vw,60px) !important;font-weight:800 !important;}
+.page-hero p{font-size:19px !important;font-weight:600 !important;line-height:1.7 !important;color:#e8e6e0 !important;}
+.breadcrumb{font-size:15px !important;font-weight:600 !important;}
+.eyebrow{font-size:15px !important;font-weight:700 !important;}
+.sec-head h2{font-size:clamp(32px,3.8vw,46px) !important;font-weight:800 !important;}
+.sec-head p{font-size:18px !important;font-weight:600 !important;line-height:1.7 !important;}
+.portfolio-overlay h4{font-size:21px !important;font-weight:700 !important;}
+.portfolio-overlay .cat{font-size:12px !important;}
+.hero-stats .num{font-size:38px !important;font-weight:800 !important;}
+.hero-stats .lbl{font-size:16px !important;font-weight:600 !important;}
+.final-cta h2{font-size:clamp(34px,4.6vw,52px) !important;font-weight:800 !important;}
+.final-cta p{font-size:19px !important;font-weight:600 !important;}
+.filter-chip{font-size:13.5px !important;font-weight:600 !important;}
+
+/* ---- Additional case studies: alternating glow + client quote ---- */
+.case-study-alt{position:relative;overflow:hidden;}
+.case-study-glow{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.case-study-glow::before{
+  content:'';position:absolute;width:520px;height:520px;border-radius:50%;filter:blur(90px);
+  background:radial-gradient(circle, var(--cs-accent), transparent 70%);opacity:0.16;
+  top:-160px;right:-120px;animation:csGlowDrift 14s ease-in-out infinite;
+}
+@keyframes csGlowDrift{
+  0%,100%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(-40px,50px) scale(1.15);}
+}
+.case-study-alt .wrap{position:relative;z-index:1;}
+.case-study-alt .hero-stats .num{color:var(--cs-accent);}
+.case-quote{
+  font-family:var(--font-display);font-style:italic;font-weight:450;
+  font-size:19px;line-height:1.6;color:#e8e6e0;
+  border-left:3px solid var(--cs-accent);padding-left:24px;max-width:640px;
+}
+.case-quote span{
+  display:block;margin-top:14px;font-family:var(--font-mono);font-style:normal;
+  font-size:12.5px;color:var(--cs-accent);letter-spacing:0.03em;
+}
+@media(prefers-reduced-motion: reduce){
+  .case-study-glow::before{animation:none;}
+}
+</style>
+<link rel="stylesheet" href="assets/responsive.css?v=20260719a">
+</head>
+<body>
+
+<video class="page-bg-video" autoplay muted loop playsinline preload="auto" id="pageBgVideo">
+  <source src="assets/videos/orbit-section-bg.mp4" type="video/mp4">
+</video>
+<div class="page-bg-overlay"></div>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+</div>
+<div class="grain"></div>
+
+<nav id="nav">
+  <div class="wrap">
+    <a href="index.html" class="logo"><img src="assets/images/logo-transparent.png" alt="Supreme Commerce" class="logo-img"></a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="portfolio.html" class="active">Portfolio</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <a href="contact.html" class="btn btn-brass">Start a project</a>
+      <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero" id="portfolioHero" style="position:relative;overflow:hidden;">
+  <div class="founder-particles" id="portfolioParticles" style="position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;"></div>
+  <div class="wrap" style="position:relative;z-index:1;">
+    <h1 class="reveal">Real stores. Real launches.</h1>
+    <p class="reveal">A sample of projects across our seven services — filter by channel to see relevant work.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <div class="filter-row reveal">
+      <button class="filter-chip active" data-filter="all">All work</button>
+      <button class="filter-chip" data-filter="walmart">Walmart</button>
+      <button class="filter-chip" data-filter="facebook">Facebook Marketplace</button>
+      <button class="filter-chip" data-filter="tiktok">TikTok Shop</button>
+      <button class="filter-chip" data-filter="shopify">Shopify</button>
+      <button class="filter-chip" data-filter="web">Website Dev</button>
+      <button class="filter-chip" data-filter="seo">SEO</button>
+      <button class="filter-chip" data-filter="social">Social Media</button>
+    </div>
+
+    <div class="portfolio-grid" id="portfolioGrid">
+      <div class="portfolio-card wide reveal" data-cat="shopify" data-title="Coastal Home — full store rebuild" data-img="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80">
+        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" alt="">
+        <div class="portfolio-overlay"><span class="cat">Shopify</span><h4>Coastal Home — full store rebuild</h4></div>
+      </div>
+      <div class="portfolio-card reveal" data-cat="walmart" data-title="Northline Tools — 800 SKU launch" data-img="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&q=80">
+        <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80" alt="">
+        <div class="portfolio-overlay"><span class="cat">Walmart</span><h4>Northline Tools — 800 SKU launch</h4></div>
+      </div>
+      <div class="portfolio-card reveal" data-cat="tiktok" data-title="Glow Lab — creator-ready catalog" data-img="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=1200&q=80">
+        <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=600&q=80" alt="">
+        <div class="portfolio-overlay"><span class="cat">TikTok Shop</span><h4>Glow Lab — creator-ready catalog</h4></div>
+      </div>
+      <div class="portfolio-card reveal" data-cat="web" data-title="Marden Studio — custom site build" data-img="https://images.unsplash.com/photo-1547658719-da2b51169166?w=1200&q=80">
+        <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&q=80" alt="">
+        <div class="portfolio-overlay"><span class="cat">Website Dev</span><h4>Marden Studio — custom site build</h4></div>
+      </div>
+      <div class="portfolio-card wide reveal" data-cat="social" data-title="Verde Foods — content calendar &amp; growth" data-img="https://images.unsplash.com/photo-1611262588024-d12430b98920?w=1200&q=80">
+        <img src="https://images.unsplash.com/photo-1611262588024-d12430b98920?w=800&q=80" alt="">
+        <div class="portfolio-overlay"><span class="cat">Social Media</span><h4>Verde Foods — content calendar &amp; growth</h4></div>
+      </div>
+      <div class="portfolio-card reveal" data-cat="seo" data-title="Bramble & Co — organic traffic 3x" data-img="https://images.unsplash.com/photo-1571677246347-5040036b95cc?w=1200&q=80">
+        <img src="https://images.unsplash.com/photo-1571677246347-5040036b95cc?w=600&q=80" alt="">
+        <div class="portfolio-overlay"><span class="cat">SEO</span><h4>Bramble & Co — organic traffic 3x</h4></div>
+      </div>
+      <div class="portfolio-card reveal" data-cat="facebook" data-title="Reclaimed Furniture Co." data-img="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=1200&q=80">
+        <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=600&q=80" alt="">
+        <div class="portfolio-overlay"><span class="cat">Facebook Marketplace</span><h4>Reclaimed Furniture Co.</h4></div>
+      </div>
+      <div class="portfolio-card reveal" data-cat="shopify" data-title="Nadia Skincare — DTC launch" data-img="https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1200&q=80">
+        <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?w=600&q=80" alt="">
+        <div class="portfolio-overlay"><span class="cat">Shopify</span><h4>Nadia Skincare — DTC launch</h4></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Click-to-zoom lightbox, matching the homepage carousel component -->
+<div class="focus-lightbox" id="focusLightbox">
+  <div class="focus-lightbox-backdrop" id="focusLightboxBackdrop"></div>
+  <div class="focus-lightbox-card" id="focusLightboxCard">
+    <button class="focus-lightbox-close" id="focusLightboxClose" aria-label="Close">✕</button>
+    <div class="focus-lightbox-img" id="focusLightboxImg"></div>
+    <div class="focus-lightbox-content">
+      <span class="focus-lightbox-tag" id="focusLightboxTag"></span>
+      <h3 id="focusLightboxTitle"></h3>
+    </div>
+  </div>
+</div>
+
+<section class="section section-light stats-section">
+  <div class="stats-glow"></div>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Coastal Home: from side hustle to seven figures.</h2>
+      <p>A single-channel eBay reseller expanded to Shopify, Walmart, and TikTok Shop over eight months with Supreme Commerce running each launch.</p>
+    </div>
+    <div class="hero-stats reveal" style="border-top:1px solid var(--line);padding-top:24px;">
+      <div><span class="num counter" data-target="4">0</span><span class="lbl">Channels launched</span></div>
+      <div><span class="num counter" data-target="312" data-suffix="%">0</span><span class="lbl">Revenue growth</span></div>
+      <div><span class="num counter" data-target="8">0</span><span class="lbl">Months to scale</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section case-study-alt" style="--cs-accent:#F0B84A;">
+  <div class="case-study-glow"></div>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Northline Tools: 800 SKUs live in three weeks.</h2>
+      <p>A wholesale tools distributor needed their entire catalog on Walmart before a seasonal buying window — automated repricing kept them competitive from day one.</p>
+    </div>
+    <div class="hero-stats reveal" style="border-top:1px solid var(--line);padding-top:24px;margin-bottom:32px;">
+      <div><span class="num counter" data-target="800">0</span><span class="lbl">SKUs launched</span></div>
+      <div><span class="num counter" data-target="21">0</span><span class="lbl">Days to full catalog</span></div>
+      <div><span class="num counter" data-target="98" data-suffix="%">0</span><span class="lbl">Listing accuracy</span></div>
+    </div>
+    <div class="case-quote reveal">
+      "We'd tried listing manually for months and barely hit 200 SKUs. Supreme Commerce had the full catalog live before our busiest season even started."
+      <span>— Owner, Northline Tools</span>
+    </div>
+  </div>
+</section>
+
+<section class="section case-study-alt" style="--cs-accent:#3FE0C8;">
+  <div class="case-study-glow"></div>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Glow Lab: built for creators from day one.</h2>
+      <p>A skincare brand launching on TikTok Shop needed a catalog creators could actually work with — clean product data, fast approvals, and a shop tab ready for affiliate traffic.</p>
+    </div>
+    <div class="hero-stats reveal" style="border-top:1px solid var(--line);padding-top:24px;margin-bottom:32px;">
+      <div><span class="num counter" data-target="46">0</span><span class="lbl">Creator partnerships</span></div>
+      <div><span class="num counter" data-target="185" data-suffix="%">0</span><span class="lbl">Sales growth, 90 days</span></div>
+      <div><span class="num counter" data-target="12">0</span><span class="lbl">Days to shop approval</span></div>
+    </div>
+    <div class="case-quote reveal">
+      "They understood TikTok Shop isn't just another marketplace listing — the catalog was creator-ready from the first day it went live."
+      <span>— Founder, Glow Lab</span>
+    </div>
+  </div>
+</section>
+
+<section class="section cta-footer-bg" id="ctaFadeSection">
+  <div class="wrap">
+    <div class="final-cta reveal">
+      <h2>Want results like these?</h2>
+      <p>Tell us about your store — we'll show you what a launch plan could look like.</p>
+      <div class="hero-cta">
+        <a href="contact.html" class="btn btn-brass">Start a project →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="cta-footer-bg">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <div class="logo"><img src="assets/images/logo-transparent.png" alt="Supreme Commerce" class="logo-img"></div>
+        <p class="foot-desc">A full-service e-commerce team building and running Walmart, Facebook Marketplace, TikTok Shop, and Shopify stores — plus the website, SEO, and social media around them.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Services</h5>
+        <a href="services.html#walmart">Walmart Automation</a>
+        <a href="services.html#facebook">Facebook Marketplace</a>
+        <a href="services.html#tiktok">TikTok Shop</a>
+        <a href="services.html#shopify">Shopify</a>
+      </div>
+      <div class="foot-col">
+        <h5>Company</h5>
+        <a href="about.html">About us</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="services.html">All services</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h5>Legal</h5>
+        <a href="#">Terms of service</a>
+        <a href="#">Privacy policy</a>
+        <a href="#">Refund policy</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Supreme Commerce. All rights reserved.</span>
+      <span>Secure payments · Dedicated specialists</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/script.js?v=20260719a"></script>
+<script src="assets/responsive.js?v=20260719a"></script>
+<script>
+  initCounters('.counter');
+  initParticles('portfolioParticles', 16);
+
+  // Page-wide background video: safety nudge for browsers that block autoplay until interaction
+  const pageBgVideo = document.getElementById('pageBgVideo');
+  if (pageBgVideo) {
+    pageBgVideo.play().catch(() => {
+      document.addEventListener('click', () => pageBgVideo.play(), { once: true });
+    });
+  }
+
+  // Filter chips
+  const chips = document.querySelectorAll('.filter-chip');
+  const cards = document.querySelectorAll('.portfolio-card');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const f = chip.dataset.filter;
+      cards.forEach(card => {
+        card.classList.toggle('hidden', f !== 'all' && card.dataset.cat !== f);
+      });
+    });
+  });
+
+  // Click-to-zoom lightbox, same behavior as the homepage "Recent Work" carousel
+  const focusLightbox = document.getElementById('focusLightbox');
+  if (focusLightbox) {
+    const lightboxImg = document.getElementById('focusLightboxImg');
+    const lightboxTag = document.getElementById('focusLightboxTag');
+    const lightboxTitle = document.getElementById('focusLightboxTitle');
+    const lightboxCardEl = document.getElementById('focusLightboxCard');
+    const closeBtn = document.getElementById('focusLightboxClose');
+    const backdrop = document.getElementById('focusLightboxBackdrop');
+
+    function openLightbox(card) {
+      const accent = getComputedStyle(card).getPropertyValue('--port-accent').trim() || 'var(--brass-bright)';
+      const catLabel = card.querySelector('.cat').textContent;
+      lightboxImg.style.backgroundImage = `url('${card.dataset.img}')`;
+      lightboxTag.textContent = catLabel;
+      lightboxTag.style.background = accent;
+      lightboxTag.style.color = '#04070a';
+      lightboxTag.style.boxShadow = `0 0 16px ${accent}`;
+      lightboxTitle.textContent = card.dataset.title;
+      lightboxCardEl.style.setProperty('--neon', accent);
+      focusLightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      focusLightbox.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    cards.forEach(card => card.addEventListener('click', () => openLightbox(card)));
+    closeBtn.addEventListener('click', closeLightbox);
+    backdrop.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+  }
+</script>
+<script src="assets/chat-widget.js"></script>
+</body>
+</html>

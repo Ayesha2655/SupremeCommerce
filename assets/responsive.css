@@ -1,0 +1,604 @@
+/* =====================================================================
+   SUPREME COMMERCE — RESPONSIVE LAYER
+   ---------------------------------------------------------------------
+   Load this LAST on every page — after style.css AND after the page's
+   own inline <style> block (i.e. immediately before </head>).
+   Order matters: the inline blocks use !important, so this file only
+   wins if the browser sees it afterwards.
+
+   Design is unchanged. Every value's ceiling matches the existing
+   desktop value — this only adds a floor and a ramp between them.
+   ===================================================================== */
+
+:root{
+  /* Single source of truth for horizontal breathing room. */
+  --gutter: clamp(16px, 4vw, 32px);
+  /* Vertical rhythm between major sections. */
+  --section-y: clamp(64px, 10vw, 120px);
+  /* Fixed-nav clearance, used by every page hero. */
+  --nav-h: 76px;
+}
+
+/* =====================================================================
+   1. FOUNDATION
+   ===================================================================== */
+
+/* overflow-x:hidden on body hides horizontal overflow but doesn't stop
+   it — the page still scrolls sideways on iOS. Clip at the root too. */
+html{ overflow-x: hidden; overflow-x: clip; }
+body{ overflow-x: hidden; overflow-x: clip; }
+
+/* Long unbroken strings (emails, URLs) were pushing cards wide. */
+body{ overflow-wrap: break-word; }
+.contact-info-card p,
+.foot-desc,
+.timeline-company,
+.sd-content p{ overflow-wrap: anywhere; }
+
+/* Media never exceeds its column. */
+img, video, svg, iframe{ max-width: 100%; }
+
+/* Fluid container: 32px gutter on desktop, 16px on a 360px phone.
+   That's 32px of content width recovered on the narrowest devices. */
+.wrap{
+  width: 100%;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+/* This full-bleed track hard-coded ±32px to match the old gutter.
+   Re-tie it to the token so it can't drift. */
+.testi-track-wrap{
+  margin-left: calc(-1 * var(--gutter));
+  margin-right: calc(-1 * var(--gutter));
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+/* 100vh includes mobile browser chrome, so heroes were ~90px taller
+   than the visible viewport and the CTA sat below the fold. */
+@supports (height: 100svh){
+  .hero, .cine-hero{ min-height: 100svh; }
+  .cmd-hero{ min-height: 92svh; }
+  .founder-hero{ min-height: 82svh; }
+}
+
+/* =====================================================================
+   2. NAVIGATION
+   The critical bug: .nav-links hid at 980px but .nav-toggle only
+   appeared at 640px — every device between 641px and 980px (iPad
+   portrait, iPad Mini, small laptops, split-screen) had no navigation
+   at all. Both now switch at the same breakpoint.
+   ===================================================================== */
+
+.nav-toggle{
+  /* Was a 22px target. 44px is the minimum comfortable tap size. */
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+.nav-toggle:focus-visible{
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 2px;
+}
+
+nav .wrap{ gap: 12px; }
+.logo{ flex-shrink: 1; min-width: 0; }
+
+/* responsive.js injects these into #navLinks on every screen size, not
+   just mobile — without a default hidden state they leak into the
+   always-visible desktop nav as a bare unstyled "✕" and a duplicate
+   "Start a project" button. Hidden here; the media query below turns
+   them back on for the drawer they were actually built for. */
+.nav-drawer-close,
+.nav-links .nav-drawer-cta{ display: none; }
+
+@media (max-width: 980px){
+  .nav-toggle{ display: flex; }
+
+  /* The header CTA is cloned into the drawer (see responsive.js) the
+     moment the hamburger takes over, so it must hide at this same
+     980px breakpoint — it was previously only hidden below 600px,
+     leaving both the header button and the drawer's clone visible
+     together between 601–980px (tablets, small laptops). */
+  nav .btn-brass{ display: none; }
+
+  /* A dropdown panel anchored under the header — not a full-height
+     off-canvas drawer. It only covers its own section of the screen
+     (top-right, sized to its content) instead of the whole viewport,
+     and the reveal is a vertical drop rather than a full-screen slide. */
+  .nav-links{
+    display: flex;
+    position: fixed;
+    top: calc(var(--nav-h) + 10px);
+    right: var(--gutter);
+    left: auto;
+    bottom: auto;
+    width: min(78vw, 300px);
+    max-width: none;
+    max-height: min(70vh, 480px);
+    /* Solid theme color, not a translucent glass panel — reads as a
+       deliberate opaque surface instead of a see-through overlay. */
+    background: var(--ink-2);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 22px 22px;
+    gap: 4px;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7);
+    z-index: 99;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    transform-origin: top right;
+    transform: translateY(-10px) scale(0.97);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .25s ease, visibility 0s linear .3s;
+  }
+  .nav-links.open{
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .25s ease, visibility 0s linear 0s;
+  }
+
+  /* Close control injected by responsive.js — sits at the top of the panel
+     since closing shouldn't require tapping a link and navigating away. */
+  .nav-drawer-close{
+    align-self: flex-end;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    margin-bottom: 4px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.05);
+    color: var(--porcelain);
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background .25s ease, border-color .25s ease, color .25s ease;
+  }
+  .nav-drawer-close:hover{
+    background: var(--brass);
+    border-color: var(--brass);
+    color: var(--ink);
+  }
+
+  /* Full-width rows with real tap targets, not 14px text links. */
+  .nav-links a{
+    display: block;
+    width: 100%;
+    font-size: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-links a:last-of-type{ border-bottom: none; }
+
+  /* Injected by responsive.js — the header CTA, relocated. */
+  .nav-links .nav-drawer-cta{
+    display: flex;
+    margin-top: 20px;
+    width: 100%;
+    justify-content: center;
+    padding: 14px 22px;
+    border-bottom: none;
+  }
+
+  /* Dim + block the page behind the open drawer.
+     !important: .nav-scrim is appended straight to <body> by responsive.js,
+     so it's a direct body child too — same specificity trap as nav above,
+     the generic body>* rule was demoting it to position:relative;z-index:2,
+     which collapses it to zero height (no fixed inset) at the end of the
+     page instead of a full-viewport dimming layer. */
+  .nav-scrim{
+    position: fixed !important;
+    inset: 0;
+    z-index: 98 !important;
+    background: rgba(6, 8, 11, 0.6);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s ease;
+  }
+  .nav-scrim.open{ opacity: 1; pointer-events: auto; }
+}
+
+/* Below 600px the logo and the toggle couldn't share one row —
+   on a 360px screen they overflowed. */
+@media (max-width: 600px){
+  .logo{ font-size: 18px; }
+  .logo-mark{ width: 26px; height: 26px; font-size: 12px; }
+  .logo-img{ height: 46px; }
+  nav.scrolled .logo-img{ height: 38px; }
+  footer .logo-img{ height: 44px; }
+  nav{ padding: 18px 0; }
+  nav.scrolled{ padding: 12px 0; }
+}
+
+@media (max-width: 360px){
+  .logo{ font-size: 16px; gap: 8px; }
+  .logo-img{ height: 40px; }
+  nav.scrolled .logo-img{ height: 34px; }
+}
+
+/* When the drawer is open, stop the page behind it from scrolling. */
+body.nav-open{ overflow: hidden; }
+
+/* =====================================================================
+   3. FLUID SECTION RHYTHM
+   120px of padding is right on a 27" display and absurd on a phone,
+   where it's a third of the viewport height before any content.
+   ===================================================================== */
+
+.section{ padding: var(--section-y) 0; }
+.mission-section{ padding: var(--section-y) 0; }
+.narrative{ padding: clamp(72px, 11vw, 130px) 0; }
+.service-wrap-outer{ padding: clamp(20px, 3vw, 36px) 0; }
+
+.page-hero{
+  min-height: auto;
+  padding: clamp(112px, 17vw, 150px) 0 clamp(48px, 8vw, 70px);
+}
+
+.hero{ padding: clamp(112px, 17vw, 140px) 0 clamp(56px, 8vw, 80px); }
+.cine-hero{ padding: clamp(120px, 20vw, 160px) 0 clamp(56px, 9vw, 90px); }
+
+.sec-head{ margin-bottom: clamp(36px, 5vw, 64px); }
+
+.final-cta{
+  padding: clamp(48px, 7vw, 80px) clamp(22px, 5vw, 60px);
+  border-radius: clamp(18px, 2.5vw, 28px);
+}
+
+footer{ padding: clamp(48px, 7vw, 70px) 0 clamp(28px, 4vw, 40px); }
+.foot-grid{ margin-bottom: clamp(36px, 5vw, 60px); gap: clamp(28px, 4vw, 40px); }
+
+/* =====================================================================
+   4. FLUID TYPOGRAPHY
+   The per-page !important blocks set desktop sizes with no floor:
+   .page-hero p was locked at 19px, .sd-price b at 32px, .hero-stats
+   .num at 38px — on a 360px screen those are enormous. Each rule below
+   keeps the exact desktop maximum and only adds a mobile minimum.
+   ===================================================================== */
+
+h1{ font-size: clamp(30px, 6.4vw, 64px); }
+
+.page-hero h1{ font-size: clamp(28px, 6.2vw, 60px) !important; }
+.page-hero p{ font-size: clamp(15px, 2.6vw, 19px) !important; }
+.founder-hero h1{ font-size: clamp(30px, 6.4vw, 58px) !important; }
+.cine-hero h1{ font-size: clamp(30px, 6.6vw, 68px); }
+
+.breadcrumb{ font-size: clamp(12px, 1.8vw, 15px) !important; }
+.eyebrow{ font-size: clamp(11px, 1.8vw, 15px) !important; }
+
+.sec-head h2{ font-size: clamp(25px, 5.4vw, 46px) !important; }
+.sec-head p{ font-size: clamp(15px, 2.4vw, 18px) !important; }
+
+.hero-sub{ font-size: clamp(15px, 2.2vw, 17.5px); }
+.hero-stats .num{ font-size: clamp(22px, 4.6vw, 38px) !important; }
+.hero-stats .lbl{ font-size: clamp(11px, 1.8vw, 16px) !important; }
+
+.final-cta h2{ font-size: clamp(26px, 5.6vw, 52px) !important; }
+.final-cta p{ font-size: clamp(15px, 2.4vw, 19px) !important; }
+
+.narrative p{ font-size: clamp(15.5px, 2.4vw, 19px); }
+.mission-section p{ font-size: clamp(15px, 2.4vw, 17.5px); }
+
+/* about.html */
+.story-content h2{ font-size: clamp(24px, 5vw, 40px) !important; }
+.story-content p{ font-size: clamp(15px, 2.3vw, 18px) !important; }
+.value-card h4{ font-size: clamp(18px, 2.8vw, 23px) !important; }
+.value-card p{ font-size: clamp(14.5px, 2.1vw, 16.5px) !important; }
+.value-card .num{ font-size: clamp(12px, 1.8vw, 15px) !important; }
+.team-card h5{ font-size: clamp(15px, 2.4vw, 20px) !important; }
+.team-card span{ font-size: clamp(11px, 1.7vw, 15px) !important; }
+.founder-hero-bio{ font-size: clamp(15.5px, 2.6vw, 22px) !important; }
+.founder-title{ font-size: clamp(13px, 2vw, 16px); }
+.timeline-content h4{ font-size: clamp(17px, 2.8vw, 23px); }
+.timeline-company{ font-size: clamp(14px, 2vw, 16px); }
+.timeline-status{ font-size: clamp(11px, 1.7vw, 12.5px); }
+
+/* services.html */
+.sd-index{ font-size: clamp(11px, 1.7vw, 14px) !important; }
+.sd-content h2{ font-size: clamp(24px, 5vw, 50px) !important; }
+.sd-content > p{ font-size: clamp(15px, 2.4vw, 18.5px) !important; }
+.sd-features li{ font-size: clamp(14px, 2.1vw, 16.5px) !important; }
+.sd-price b{ font-size: clamp(22px, 3.6vw, 32px) !important; }
+.sd-price{ font-size: clamp(10.5px, 1.5vw, 11.5px); }
+
+/* contact.html */
+.form-field label{ font-size: clamp(13.5px, 2vw, 15px) !important; }
+.submit-note{ font-size: clamp(12.5px, 1.9vw, 14px) !important; }
+.form-success{ font-size: clamp(14px, 2.1vw, 16px) !important; }
+.contact-info-card h5{ font-size: clamp(15px, 2.2vw, 17px) !important; }
+.contact-info-card p{ font-size: clamp(13.5px, 2vw, 15.5px) !important; }
+
+/* Keep form inputs at 16px+ — anything smaller makes iOS Safari zoom
+   the whole page on focus, which is the single worst mobile form bug. */
+.form-field input,
+.form-field textarea,
+.form-field select{ font-size: 16px !important; }
+@media (min-width: 768px){
+  .form-field input,
+  .form-field textarea,
+  .form-field select{ font-size: 16.5px !important; }
+}
+
+.btn{ font-size: clamp(13.5px, 2vw, 15.5px) !important; }
+
+/* =====================================================================
+   5. LAYOUT GRIDS
+   ===================================================================== */
+
+/* --- 1100px: small laptops / large tablets --- */
+@media (max-width: 1100px){
+  /* Command-center cards have min-width:220–250px but percentage-based
+     positions, so below ~1200px they stop shrinking and collide with
+     the text panel. Retire them earlier. */
+  .cmd-card{ display: none; }
+  .service-detail .wrap{
+    padding-left: clamp(20px, 4vw, 64px);
+    padding-right: clamp(20px, 4vw, 64px);
+  }
+}
+
+/* --- 1024px: tablet landscape --- */
+@media (max-width: 1024px){
+  /* Four 200px columns with 26px of padding left ~148px of text.
+     Two columns is the honest answer here. */
+  .method-grid{ grid-template-columns: repeat(2, 1fr); }
+  .method-step{ border-bottom: 1px solid var(--line); }
+  .method-step:nth-child(2n){ border-right: none; }
+  .method-line-track{ display: none; }
+
+  .svc-grid{ grid-template-columns: repeat(2, 1fr); }
+  .story-grid{ gap: clamp(32px, 5vw, 70px); }
+}
+
+/* --- 980px: tablet portrait --- */
+@media (max-width: 980px){
+  .hero-stats{ flex-wrap: wrap; gap: clamp(20px, 4vw, 36px) !important; }
+  .foot-grid{ grid-template-columns: repeat(2, 1fr); }
+  .team-grid{ gap: clamp(14px, 2.5vw, 24px); }
+  .value-grid{ gap: clamp(18px, 3vw, 24px); }
+  .portfolio-grid{ gap: clamp(14px, 2vw, 22px); }
+}
+
+/* --- 900px: the two-column-to-one crossover --- */
+@media (max-width: 900px){
+  /* Never collapsed before — two 1fr columns with a 70px gap held all
+     the way down to 320px, crushing the copy to ~100px wide. */
+  .story-grid{ grid-template-columns: 1fr; gap: 32px; }
+  .story-visual{ aspect-ratio: 16/10; }
+
+  .service-detail{ min-height: auto; padding: clamp(48px, 8vw, 80px) 0; }
+  .sd-content,
+  .service-detail:nth-of-type(even) .sd-content{
+    max-width: 100%;
+    margin-left: 0;
+    padding: clamp(28px, 5vw, 48px) clamp(24px, 4.5vw, 46px);
+  }
+  .sd-content::before{ font-size: clamp(78px, 14vw, 150px); }
+
+  /* aspect-ratio:16/8 forced a 384px-tall box at 768px wide while the
+     copy inside needed ~420px, so text spilled out of the frame. */
+  .founder-teaser{
+    aspect-ratio: auto;
+    min-height: auto;
+    padding: clamp(56px, 9vw, 100px) 0;
+    margin: 0 var(--gutter);
+  }
+  .founder-teaser .wrap{
+    padding-left: clamp(24px, 4vw, 56px);
+    padding-right: clamp(24px, 4vw, 56px);
+  }
+}
+
+/* --- 860px --- */
+@media (max-width: 860px){
+  .founder-text-side{ max-width: 100%; }
+  .founder-hero{ padding-top: clamp(120px, 20vw, 150px); }
+  .founder-hero-bio{ max-width: 100%; }
+}
+
+/* --- 768px: large phone / small tablet --- */
+@media (max-width: 768px){
+  /* .cine-hero pins content to align-items:flex-end for a "cinematic
+     poster" look on desktop — on a full-height mobile viewport that
+     shoves the headline down near the bottom edge, under a lot of
+     empty background. Centering it reads far more intentional. */
+  .cine-hero{ align-items: center; }
+
+  .method-grid{ grid-template-columns: 1fr; }
+  .method-step{
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding: 28px 0;
+  }
+  .svc-grid{ grid-template-columns: 1fr; }
+  .assembly-stage{ height: clamp(320px, 62vw, 520px); }
+  .cat-card{ min-height: auto; padding: 30px 24px; }
+  .trust .wrap{ justify-content: center; text-align: center; }
+}
+
+/* --- 640px: phone --- */
+@media (max-width: 640px){
+  .foot-grid{ grid-template-columns: 1fr; gap: 30px; }
+  .foot-desc{ max-width: 100%; }
+
+  /* justify-between squashed two lines of text into 12px slivers. */
+  .foot-bottom{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    text-align: left;
+  }
+
+  .contact-info-card{ padding: 22px; }
+  .value-grid{ grid-template-columns: 1fr; }
+  .testi-card{ width: min(380px, 82vw); padding: 26px; }
+
+  .store-card{ width: min(320px, 82vw); }
+  /* Pills hung 30–56px outside the card and clipped off-screen. */
+  .pill-verified{ right: -8px; }
+  .pill-rating{ left: -12px; }
+  .pill-brass{ right: -12px; top: auto; bottom: 8px; }
+
+  .timeline-item{ padding-left: 36px; margin-bottom: 26px; }
+}
+
+/* --- 480px: small phone --- */
+@media (max-width: 480px){
+  /* Four stats in a row at 360px = 60px per stat. Two columns reads. */
+  .hero-stats{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px !important;
+  }
+  /* A 3-stat group (home hero, portfolio case studies) leaves an orphan in
+     row 2 of a 2-column grid — span and center it instead of a lopsided gap.
+     Doesn't match 4-stat groups (about.html), where nth-child(3) isn't :last-child. */
+  .hero-stats > *:nth-child(3):last-child{
+    grid-column: 1 / -1;
+    justify-self: center;
+    text-align: center;
+  }
+  .team-grid{ gap: 12px; }
+  #teamSection .team-card{ padding: 18px 12px 16px; }
+  .final-cta .hero-cta{ flex-direction: column; align-items: stretch; }
+  .final-cta .hero-cta .btn{ justify-content: center; }
+  .hero-cta{ flex-direction: column; align-items: stretch; }
+  .hero-cta .btn{ justify-content: center; }
+  .carousel-3d-stage{ height: clamp(320px, 88vw, 400px); }
+  .carousel-3d-card{
+    width: min(230px, 62vw);
+    height: min(320px, 86vw);
+    margin-left: min(-115px, -31vw);
+    margin-top: min(-160px, -43vw);
+  }
+}
+
+/* =====================================================================
+   6. COMPONENT FIXES
+   ===================================================================== */
+
+/* Orbital carousel already stacks at 860px, but the ring sizes were
+   fixed px and overflowed between 861–1024px. */
+@media (max-width: 1024px) and (min-width: 861px){
+  .orbit-wrap{ height: clamp(440px, 52vw, 560px); }
+  .orbit-path{ width: min(480px, 46vw); height: min(480px, 46vw); }
+  .insight-card{ width: min(250px, 22vw); padding: 20px 18px; }
+}
+
+/* background-attachment:fixed is ignored or janky on iOS Safari and
+   causes repaint stutter on Android. Already handled at 900px in the
+   page files — extended here to any touch device regardless of width. */
+@media (hover: none){
+  .cta-footer-bg{ background-attachment: scroll !important; }
+}
+
+/* Parallax and scene layers are expensive on mobile GPUs. */
+@media (max-width: 640px){
+  .page-cmd-bg{ background-attachment: scroll; }
+  .cmd-glow{ filter: blur(90px); }
+  .orb{ filter: blur(70px); }
+}
+
+/* Lightbox */
+@media (max-width: 640px){
+  .focus-lightbox-card{ width: 100%; max-height: 90vh; overflow-y: auto; }
+}
+
+/* =====================================================================
+   7. TOUCH & POINTER
+   Every hover transform fired as a stuck state on touch — a tap left
+   the card lifted until the next tap elsewhere.
+   ===================================================================== */
+
+@media (hover: none){
+  .svc-card:hover,
+  .service-list-card:hover,
+  #teamSection .team-card:hover,
+  .btn-brass:hover,
+  .team-photo:hover,
+  .carousel-3d-arrow:hover,
+  .founder-social-link:hover{
+    transform: none;
+  }
+  .cat-card:hover .cat-arrow{ transform: none; background: transparent; }
+  .portfolio-card:hover img{ transform: none; }
+  .svc-card:hover .svc-media img{ transform: none; }
+}
+
+/* Minimum 44px tap targets. */
+.btn{ min-height: 44px; }
+.carousel-3d-arrow{ width: 44px; height: 44px; }
+
+/* The dots were 8px. Grow the hit area without changing the visual. */
+.carousel-3d-dot{ position: relative; }
+.carousel-3d-dot::before{
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+}
+.carousel-3d-dots{ gap: 4px; padding: 6px 0; }
+
+/* Let the 3D carousel be swiped rather than only arrow-clicked. */
+.carousel-3d-stage{ touch-action: pan-y; }
+
+/* =====================================================================
+   8. ORIENTATION & MOTION
+   ===================================================================== */
+
+/* Phone held sideways: a 100vh hero is 375px tall and unusable. */
+@media (max-height: 500px) and (orientation: landscape){
+  .hero, .cine-hero, .cmd-hero, .founder-hero{
+    min-height: auto;
+    padding-top: 100px;
+    padding-bottom: 56px;
+  }
+  .nav-links{ gap: 0; }
+  .nav-links a{ padding: 10px 0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .nav-links{ transition: none; }
+  .nav-scrim{ transition: none; }
+  html{ scroll-behavior: auto; }
+}
+
+/* Keyboard focus must stay visible on every interactive element. */
+.nav-toggle:focus-visible,
+.nav-drawer-close:focus-visible,
+.form-field input:focus-visible,
+.form-field textarea:focus-visible,
+.form-field select:focus-visible,
+.carousel-3d-arrow:focus-visible,
+.carousel-3d-dot:focus-visible,
+.focus-lightbox-close:focus-visible{
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 3px;
+}
+
+/* =====================================================================
+   9. PRINT
+   ===================================================================== */
+@media print{
+  nav, .bg-orbs, .grain, .page-bg-video, .page-bg-overlay,
+  .page-cmd-bg, .page-cmd-overlay, .cine-hero-bg-layer,
+  .method-video, .orbit-video, .founder-video{ display: none !important; }
+  body{ background: #fff !important; color: #000 !important; }
+  .section{ padding: 24px 0 !important; }
+}
