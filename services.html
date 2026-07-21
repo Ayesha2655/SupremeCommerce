@@ -22,53 +22,41 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,450;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css?v=20260719a">
 <style>
-.service-wrap-outer{padding:36px 0;}
-.service-detail{
-  position:relative;
-  min-height:560px;
-  display:flex;align-items:center;
-  padding:80px 0;
-  border-radius:24px;
-  margin-bottom:36px;
-  overflow:hidden;
+.services-list{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:28px;
+  padding:20px 0;
 }
-.service-detail::before{
-  content:'';position:absolute;inset:0;z-index:1;
-  background:linear-gradient(100deg, rgba(6,8,11,0.4) 0%, rgba(6,8,11,0.2) 45%, rgba(6,8,11,0.08) 100%);
-}
-.service-detail:nth-of-type(even)::before{
-  background:linear-gradient(260deg, rgba(6,8,11,0.4) 0%, rgba(6,8,11,0.2) 45%, rgba(6,8,11,0.08) 100%);
-}
-.service-detail .wrap{position:relative;z-index:2;padding-left:64px;padding-right:64px;width:100%;}
+.service-detail{position:relative;}
 
-/* ---- Editorial glass panel ---- */
+/* ---- Editorial glass panel (grid card) ---- */
 .sd-content{
-  max-width:560px;position:relative;
+  height:100%;
+  max-width:100%;
+  position:relative;
+  display:flex;flex-direction:column;
   background:linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
   backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   border:1px solid rgba(255,255,255,0.14);
   border-radius:20px;
-  padding:48px 46px;
+  padding:44px 42px;
+  overflow:hidden;
   box-shadow:0 40px 90px -24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
 }
-.service-detail:nth-of-type(even) .sd-content{margin-left:auto;}
 
 /* Large faint watermark numeral, classic editorial touch */
 .sd-content::before{
   content:attr(data-num);
   position:absolute;top:-0.15em;right:24px;z-index:0;
-  font-family:var(--font-display);font-size:150px;font-weight:700;line-height:1;
+  font-family:var(--font-display);font-size:120px;font-weight:700;line-height:1;
   color:var(--sd-accent, var(--brass-bright));opacity:0.08;
   pointer-events:none;
 }
 .sd-content > *{position:relative;z-index:1;}
 
-.sd-index{
-  font-family:var(--font-mono);font-size:12.5px;color:var(--sd-accent, var(--brass-bright));letter-spacing:0.16em;
-  text-transform:uppercase;margin-bottom:16px;display:block;font-weight:700;
-}
 .sd-content h2{
-  font-family:var(--font-display);font-size:clamp(30px,3.6vw,44px);font-weight:700;margin-bottom:8px;
+  font-family:var(--font-display);font-size:clamp(26px,2.6vw,34px);font-weight:700;margin-bottom:8px;
   letter-spacing:-0.3px;line-height:1.1;color:#fff;
 }
 .sd-underline{
@@ -76,47 +64,33 @@
   background:linear-gradient(90deg, var(--sd-accent, var(--brass-bright)), transparent);
 }
 .sd-content > p{
-  font-size:16.5px;font-weight:400;color:#d8d6d2;line-height:1.75;margin-bottom:28px;
+  font-size:15.5px;font-weight:400;color:#d8d6d2;line-height:1.7;margin-bottom:26px;
   font-family:var(--font-display);font-style:italic;
 }
-.sd-features{list-style:none;margin-bottom:32px;}
+.sd-features{list-style:none;margin-bottom:28px;}
 .sd-features li{
-  display:flex;gap:12px;align-items:flex-start;font-size:14.5px;font-weight:500;color:#eae8e3;
-  padding:13px 0;border-top:1px solid rgba(255,255,255,0.1);
+  display:flex;gap:12px;align-items:flex-start;font-size:14px;font-weight:500;color:#eae8e3;
+  padding:12px 0;border-top:1px solid rgba(255,255,255,0.1);
 }
 .sd-features li:first-child{border-top:none;}
 .sd-features li svg{flex-shrink:0;margin-top:2px;color:var(--sd-accent, var(--signal));}
 .sd-price-row{
   display:flex;align-items:center;justify-content:space-between;
-  padding-top:24px;border-top:1px solid rgba(255,255,255,0.14);
+  padding-top:22px;border-top:1px solid rgba(255,255,255,0.14);
+  margin-top:auto;
 }
 .sd-price{
   font-family:var(--font-mono);font-size:11.5px;color:#a9a7a2;font-weight:600;
   text-transform:uppercase;letter-spacing:0.06em;
 }
 .sd-price b{
-  display:block;font-family:var(--font-display);font-weight:700;font-size:28px;color:#fff;margin-top:4px;
+  display:block;font-family:var(--font-display);font-weight:700;font-size:26px;color:#fff;margin-top:4px;
 }
 @media(prefers-reduced-motion: reduce){
   .service-detail{animation:none;}
 }
-@media(max-width:640px){
-  .service-detail{min-height:auto;padding:56px 0;border-radius:18px;margin-bottom:24px;}
-  .service-detail .wrap{padding-left:28px;padding-right:28px;}
-  .service-detail::before{background:linear-gradient(180deg, rgba(6,8,11,0.5) 0%, rgba(6,8,11,0.8) 55%);}
-  .sd-content, .service-detail:nth-of-type(even) .sd-content{max-width:100%;margin-left:0;padding:36px 30px;}
-  .sd-content::before{font-size:100px;}
-}
 
-/* ---- Per-service accent color + extra breathing room ---- */
-#walmart{margin-bottom:56px;}
-#tiktok{margin-bottom:56px;}
-#webdev{margin-bottom:56px;}
-#social{margin-bottom:56px;}
-
-.services-list{padding:20px 0;}
-
-/* ---- Per-service accent color (drives numeral watermark, index label, underline, icons) ---- */
+/* ---- Per-service accent color (drives numeral watermark, underline, icons) ---- */
 #walmart{--sd-accent:#F0B84A;}
 #facebook{--sd-accent:#7FA8FF;}
 #tiktok{--sd-accent:#3FE0C8;}
@@ -133,11 +107,10 @@
 .eyebrow{font-size:15px !important;font-weight:700 !important;}
 .final-cta h2{font-size:clamp(34px,4.6vw,52px) !important;font-weight:800 !important;}
 .final-cta p{font-size:19px !important;font-weight:600 !important;}
-.sd-index{font-size:14px !important;font-weight:800 !important;}
-.sd-content h2{font-size:clamp(34px,4vw,50px) !important;}
-.sd-content > p{font-size:18.5px !important;}
-.sd-features li{font-size:16.5px !important;}
-.sd-price b{font-size:32px !important;}
+.sd-content h2{font-size:clamp(24px,2.4vw,32px) !important;}
+.sd-content > p{font-size:15.5px !important;}
+.sd-features li{font-size:14px !important;}
+.sd-price b{font-size:26px !important;}
 /* ---- Ecommerce Command Center hero background (recreated in portable CSS/SVG) ---- */
 @keyframes cmdGlowPulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
 @keyframes cmdFloatY{0%,100%{transform:translateY(0px);}50%{transform:translateY(-14px);}}
@@ -402,155 +375,136 @@ footer.cta-footer-bg{background-position:center 55%;}
   </div>
 </section>
 
+<div class="wrap">
 <div class="services-list" id="servicesList">
 
-  <div class="service-detail" id="walmart">
-    <div class="wrap">
-      <div class="sd-content" data-num="01">
-      <span class="sd-index reveal">01 — Walmart</span>
-      <h2 class="reveal">Walmart Automation</h2>
+  <div class="service-detail reveal reveal-left" id="walmart">
+    <div class="sd-content" data-num="01">
+      <h2>Walmart Automation</h2>
       <div class="sd-underline"></div>
-      <p class="reveal">We set up your Walmart Seller Center account, upload and optimize your catalog, and automate repricing and inventory sync so your listings stay competitive without daily manual work.</p>
-      <ul class="sd-features reveal">
+      <p>We set up your Walmart Seller Center account, upload and optimize your catalog, and automate repricing and inventory sync so your listings stay competitive without daily manual work.</p>
+      <ul class="sd-features">
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Seller Center setup and account health review</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Bulk listing upload with optimized titles</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Automated repricing rules</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Inventory and order sync</li>
       </ul>
-      <div class="sd-price-row reveal">
+      <div class="sd-price-row">
         <div class="sd-price">Starting at<b>$680</b></div>
         <a href="contact.html" class="btn btn-brass">Get a quote →</a>
       </div>
     </div>
   </div>
-    </div>
 
-  <div class="service-detail" id="facebook">
-    <div class="wrap">
-      <div class="sd-content" data-num="02">
-      <span class="sd-index reveal">02 — Facebook Marketplace</span>
-      <h2 class="reveal">Facebook Marketplace</h2>
+  <div class="service-detail reveal reveal-right" id="facebook">
+    <div class="sd-content" data-num="02">
+      <h2>Facebook Marketplace</h2>
       <div class="sd-underline"></div>
-      <p class="reveal">We list your products across local and shippable Marketplace categories, write descriptions that convert, and keep listings active and responsive to buyer messages.</p>
-      <ul class="sd-features reveal">
+      <p>We list your products across local and shippable Marketplace categories, write descriptions that convert, and keep listings active and responsive to buyer messages.</p>
+      <ul class="sd-features">
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Catalog setup and category mapping</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Photo and description optimization</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Local and shippable listing strategy</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Ongoing relist and refresh schedule</li>
       </ul>
-      <div class="sd-price-row reveal">
+      <div class="sd-price-row">
         <div class="sd-price">Starting at<b>$420</b></div>
         <a href="contact.html" class="btn btn-brass">Get a quote →</a>
       </div>
     </div>
   </div>
-    </div>
 
-  <div class="service-detail" id="tiktok">
-    <div class="wrap">
-      <div class="sd-content" data-num="03">
-      <span class="sd-index reveal">03 — TikTok Shop</span>
-      <h2 class="reveal">TikTok Shop</h2>
+  <div class="service-detail reveal reveal-left" id="tiktok">
+    <div class="sd-content" data-num="03">
+      <h2>TikTok Shop</h2>
       <div class="sd-underline"></div>
-      <p class="reveal">From shop verification to product feed setup, we get your catalog live on TikTok Shop and ready for creator partnerships and in-feed checkout.</p>
-      <ul class="sd-features reveal">
+      <p>From shop verification to product feed setup, we get your catalog live on TikTok Shop and ready for creator partnerships and in-feed checkout.</p>
+      <ul class="sd-features">
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Shop verification and setup</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Product feed and catalog upload</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Creator-ready product listings</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Shop tab and showcase setup</li>
       </ul>
-      <div class="sd-price-row reveal">
+      <div class="sd-price-row">
         <div class="sd-price">Starting at<b>$1,450</b></div>
         <a href="contact.html" class="btn btn-brass">Get a quote →</a>
       </div>
     </div>
   </div>
-    </div>
 
-  <div class="service-detail" id="shopify">
-    <div class="wrap">
-      <div class="sd-content" data-num="04">
-      <span class="sd-index reveal">04 — Shopify</span>
-      <h2 class="reveal">Shopify Stores</h2>
+  <div class="service-detail reveal reveal-right" id="shopify">
+    <div class="sd-content" data-num="04">
+      <h2>Shopify Stores</h2>
       <div class="sd-underline"></div>
-      <p class="reveal">A full store build — theme design, product pages, checkout, and apps — configured to load fast and convert, not just look good.</p>
-      <ul class="sd-features reveal">
+      <p>A full store build — theme design, product pages, checkout, and apps — configured to load fast and convert, not just look good.</p>
+      <ul class="sd-features">
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Custom theme design and setup</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Product page and checkout build</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> App integration and speed optimization</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Launch checklist and QA</li>
       </ul>
-      <div class="sd-price-row reveal">
+      <div class="sd-price-row">
         <div class="sd-price">Starting at<b>$920</b></div>
         <a href="contact.html" class="btn btn-brass">Get a quote →</a>
       </div>
     </div>
   </div>
-    </div>
 
-  <div class="service-detail" id="webdev">
-    <div class="wrap">
-      <div class="sd-content" data-num="05">
-      <span class="sd-index reveal">05 — Website</span>
-      <h2 class="reveal">Website Development</h2>
+  <div class="service-detail reveal reveal-left" id="webdev">
+    <div class="sd-content" data-num="05">
+      <h2>Website Development</h2>
       <div class="sd-underline"></div>
-      <p class="reveal">Custom-coded or headless builds for brands that need more than a template — fast, responsive, and built to scale with your catalog.</p>
-      <ul class="sd-features reveal">
+      <p>Custom-coded or headless builds for brands that need more than a template — fast, responsive, and built to scale with your catalog.</p>
+      <ul class="sd-features">
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Custom design, not a stock template</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Responsive across every device</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Performance and security best practices</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> CMS handoff so you can edit content yourself</li>
       </ul>
-      <div class="sd-price-row reveal">
+      <div class="sd-price-row">
         <div class="sd-price">Starting at<b>$1,150</b></div>
         <a href="contact.html" class="btn btn-brass">Get a quote →</a>
       </div>
     </div>
   </div>
-    </div>
 
-  <div class="service-detail" id="seo">
-    <div class="wrap">
-      <div class="sd-content" data-num="06">
-      <span class="sd-index reveal">06 — SEO</span>
-      <h2 class="reveal">SEO</h2>
+  <div class="service-detail reveal reveal-right" id="seo">
+    <div class="sd-content" data-num="06">
+      <h2>SEO</h2>
       <div class="sd-underline"></div>
-      <p class="reveal">Technical fixes, on-page optimization, and a content plan built around keywords your buyers are actually searching.</p>
-      <ul class="sd-features reveal">
+      <p>Technical fixes, on-page optimization, and a content plan built around keywords your buyers are actually searching.</p>
+      <ul class="sd-features">
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Technical SEO audit and fixes</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Keyword research and on-page optimization</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Content plan and monthly reporting</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Local SEO for physical or hybrid businesses</li>
       </ul>
-      <div class="sd-price-row reveal">
+      <div class="sd-price-row">
         <div class="sd-price">Starting at<b>$540</b>/mo</div>
         <a href="contact.html" class="btn btn-brass">Get a quote →</a>
       </div>
     </div>
   </div>
-    </div>
 
-  <div class="service-detail" id="social">
-    <div class="wrap">
-      <div class="sd-content" data-num="07">
-      <span class="sd-index reveal">07 — Social</span>
-      <h2 class="reveal">Social Media Management</h2>
+  <div class="service-detail reveal reveal-left" id="social">
+    <div class="sd-content" data-num="07">
+      <h2>Social Media Management</h2>
       <div class="sd-underline"></div>
-      <p class="reveal">Content calendars, scheduled posting, and engagement handled weekly, so your channels stay active without pulling you off the business.</p>
-      <ul class="sd-features reveal">
+      <p>Content calendars, scheduled posting, and engagement handled weekly, so your channels stay active without pulling you off the business.</p>
+      <ul class="sd-features">
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Monthly content calendar</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Post design and scheduled publishing</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Community reply and engagement</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Monthly performance report</li>
       </ul>
-      <div class="sd-price-row reveal">
+      <div class="sd-price-row">
         <div class="sd-price">Starting at<b>$380</b>/mo</div>
         <a href="contact.html" class="btn btn-brass">Get a quote →</a>
       </div>
     </div>
   </div>
-    </div>
 
+</div>
 </div>
 
 <section class="section cta-footer-bg" id="ctaFadeSection">

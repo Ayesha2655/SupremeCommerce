@@ -66,12 +66,13 @@
       chips: ['pricing', 'contact']
     },
     contact: {
-      reply: "Happy to connect you with our team directly:<br><br>" +
-        "\u2709\ufe0f supremecommerce1@gmail.com<br>" +
-        "\ud83d\udcde +1 347-519-6450<br><br>" +
-        "Or use our contact form \u2014 we reply personally within one business day.",
+      reply: "Happy to connect you with our team directly \u2014 tap an icon below, or use our contact form and we'll reply personally within one business day.",
       chips: [],
-      cta: { label: 'Open contact page \u2192', href: 'contact.html' }
+      cta: { label: 'Open contact page \u2192', href: 'contact.html' },
+      icons: [
+        { type: 'email', label: 'Email us', href: 'mailto:supremecommerce1@gmail.com' },
+        { type: 'whatsapp', label: 'WhatsApp us', href: 'https://wa.me/13475196450' }
+      ]
     }
   };
 
@@ -138,6 +139,13 @@
   ".sc-msg-cta{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:2px;" +
     "font-size:12.5px;font-weight:700;color:var(--brass-bright,#C98D8A);text-decoration:none;}" +
   ".sc-msg-cta:hover{color:var(--porcelain,#F6F4EF);}" +
+
+  ".sc-msg-icons{display:flex;gap:8px;align-self:flex-start;margin-top:2px;}" +
+  ".sc-msg-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;" +
+    "background:rgba(255,255,255,0.06);border:1px solid var(--line,#212A38);color:var(--brass-bright,#C98D8A);" +
+    "transition:transform .2s ease,border-color .2s ease,background .2s ease;flex-shrink:0;}" +
+  ".sc-msg-icon svg{width:17px;height:17px;}" +
+  ".sc-msg-icon:hover{transform:scale(1.08);border-color:var(--brass-bright,#C98D8A);background:rgba(201,141,138,0.12);}" +
 
   ".sc-chips{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start;max-width:100%;}" +
   ".sc-chip{font-family:var(--font-mono,monospace);font-size:11.5px;padding:7px 12px;border-radius:100px;" +
@@ -237,6 +245,32 @@
     scrollToBottom();
   }
 
+  var ICON_SVGS = {
+    email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM4 4l8 8 8-8"/></svg>',
+    whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 1.67c2.29 0 4.44.89 6.06 2.51a8.53 8.53 0 012.5 6.06c0 4.72-3.84 8.56-8.56 8.56a8.55 8.55 0 01-4.36-1.19l-.31-.19-3.12.82.83-3.04-.2-.32a8.5 8.5 0 01-1.31-4.55c0-4.72 3.85-8.56 8.57-8.56zm-3.32 4.29c-.16 0-.42.06-.64.31s-.85.83-.85 2.03.87 2.35.99 2.52c.12.16 1.72 2.72 4.29 3.7 2.13.82 2.56.66 3.02.62.46-.05 1.49-.61 1.7-1.2.21-.59.21-1.09.15-1.2-.06-.11-.23-.17-.48-.29-.25-.13-1.49-.74-1.72-.82-.23-.09-.4-.13-.57.13-.17.25-.65.82-.8.99-.15.16-.29.19-.55.06-.25-.13-1.06-.39-2.02-1.25-.75-.66-1.25-1.48-1.4-1.73-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.24-.41.08-.16.04-.31-.02-.44-.06-.13-.57-1.38-.79-1.89-.2-.49-.41-.42-.57-.43-.15-.01-.31-.01-.47-.01z"/></svg>'
+  };
+
+  function addIcons(icons) {
+    if (!icons || !icons.length) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'sc-msg-icons';
+    icons.forEach(function (icon) {
+      var a = document.createElement('a');
+      a.className = 'sc-msg-icon';
+      a.href = icon.href;
+      a.setAttribute('aria-label', icon.label);
+      a.title = icon.label;
+      if (icon.href.indexOf('mailto:') !== 0) {
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+      }
+      a.innerHTML = ICON_SVGS[icon.type] || '';
+      wrap.appendChild(a);
+    });
+    body.appendChild(wrap);
+    scrollToBottom();
+  }
+
   function addChips(keys) {
     if (!keys || !keys.length) return;
     var wrap = document.createElement('div');
@@ -274,6 +308,7 @@
     showTyping(function () {
       addMessage(topic.reply, 'bot');
       if (topic.cta) addCta(topic.cta.label, topic.cta.href);
+      addIcons(topic.icons);
       addChips(topic.chips);
     });
   }
@@ -300,6 +335,7 @@
         var topic = TOPICS[matched];
         addMessage(topic.reply, 'bot');
         if (topic.cta) addCta(topic.cta.label, topic.cta.href);
+        addIcons(topic.icons);
         addChips(topic.chips);
       } else {
         addMessage(FALLBACK, 'bot');
