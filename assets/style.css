@@ -395,7 +395,7 @@ footer{padding:70px 0 40px;border-top:1px solid var(--line);}
 }
 .breadcrumb a{color:var(--slate);transition:color .2s ease;}
 .breadcrumb a:hover{color:var(--brass-bright);}
-.page-hero h1{font-family:var(--font-display);font-size:clamp(34px,4.6vw,56px);font-weight:600;line-height:1.08;letter-spacing:-0.5px;margin-bottom:20px;}
+.page-hero h1,.page-hero h2{font-family:var(--font-display);font-size:clamp(34px,4.6vw,56px);font-weight:600;line-height:1.08;letter-spacing:-0.5px;margin-bottom:20px;}
 .page-hero p{font-size:16.5px;line-height:1.65;color:var(--slate);max-width:600px;}
 
 /* Service icon tile (reused across service cards) */
