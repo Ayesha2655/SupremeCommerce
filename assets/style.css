@@ -132,6 +132,95 @@ footer .logo-img{height:56px;}
 .nav-links a:focus-visible, .btn:focus-visible, .cat-card:focus-visible, .svc-card:focus-visible{
   outline:2px solid var(--brass-bright);outline-offset:3px;
 }
+
+/* ---------- NAV DROPDOWN (Services) ---------- */
+.nav-item{position:relative;display:flex;align-items:center;}
+.dropdown-trigger{display:flex;align-items:center;gap:6px;}
+.dropdown-caret{
+  width:7px;height:7px;margin-top:-3px;
+  border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;
+  transform:rotate(45deg);transition:transform .25s ease;
+}
+.nav-item:hover .dropdown-caret,
+.nav-item:focus-within .dropdown-caret{transform:rotate(225deg);margin-top:3px;}
+.dropdown-menu{
+  /* Starts flush at top:100% (no gap) and uses padding-top, not a
+     margin/offset, to push the visible panel down. That padding is
+     still part of this hoverable element, so the cursor travelling
+     from the trigger to the panel never crosses dead space — with a
+     real gap there, :hover (and pointer-events) drops the instant the
+     mouse leaves the trigger, so a click below the gap lands on
+     whatever is behind the menu instead of the link. */
+  position:absolute;top:100%;left:50%;padding-top:20px;
+  transform:translateX(-50%);
+  min-width:240px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .25s ease, visibility 0s linear .25s;
+  z-index:110;
+}
+.nav-item:hover .dropdown-menu,
+.nav-item:focus-within .dropdown-menu{
+  opacity:1;visibility:visible;pointer-events:auto;
+  transition:opacity .25s ease, visibility 0s linear 0s;
+}
+.dropdown-panel{
+  background:linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)), var(--ink-2);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--line);
+  border-radius:16px;padding:10px;
+  box-shadow:0 30px 70px -20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+  transform:translateY(-10px) scale(.97);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1);
+}
+.nav-item:hover .dropdown-panel,
+.nav-item:focus-within .dropdown-panel{
+  transform:translateY(0) scale(1);
+}
+.dropdown-label{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--brass-bright);padding:8px 14px 10px;
+  border-bottom:1px solid var(--line);margin-bottom:6px;
+}
+.dropdown-menu a{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:11px 14px;border-radius:9px;
+  font-size:14px;color:var(--slate);white-space:nowrap;
+  position:relative;
+  transition:color .2s ease, background .2s ease, padding-left .2s ease;
+  opacity:0;transform:translateY(-6px);
+}
+.dropdown-menu a::before{
+  content:'';position:absolute;left:2px;top:50%;transform:translateY(-50%);
+  width:3px;height:0;border-radius:2px;background:var(--brass-bright);
+  transition:height .2s ease;
+}
+.dropdown-menu a::after{
+  content:'→';font-family:var(--font-mono);font-size:12px;color:var(--brass-bright);
+  opacity:0;transform:translateX(-4px);
+  transition:opacity .2s ease, transform .2s ease;
+}
+.dropdown-menu a:hover{background:rgba(255,255,255,0.06);color:var(--porcelain);padding-left:20px;}
+.dropdown-menu a:hover::before{height:60%;}
+.dropdown-menu a:hover::after{opacity:1;transform:translateX(0);}
+
+/* Items fly in staggered, but only once the panel is actually open —
+   scoping the animation to :hover/:focus-within keeps them invisible
+   (and untabbable-looking) the rest of the time without needing JS. */
+.nav-item:hover .dropdown-menu a,
+.nav-item:focus-within .dropdown-menu a{
+  animation:dropdownItemIn .3s cubic-bezier(.2,.8,.2,1) forwards;
+}
+.dropdown-menu a:nth-of-type(1){animation-delay:.03s;}
+.dropdown-menu a:nth-of-type(2){animation-delay:.06s;}
+.dropdown-menu a:nth-of-type(3){animation-delay:.09s;}
+.dropdown-menu a:nth-of-type(4){animation-delay:.12s;}
+.dropdown-menu a:nth-of-type(5){animation-delay:.15s;}
+.dropdown-menu a:nth-of-type(6){animation-delay:.18s;}
+.dropdown-menu a:nth-of-type(7){animation-delay:.21s;}
+@keyframes dropdownItemIn{
+  from{opacity:0;transform:translateY(-6px);}
+  to{opacity:1;transform:translateY(0);}
+}
 .btn{
   font-family:var(--font-body);font-weight:600;font-size:14px;
   padding:12px 22px;border-radius:100px;cursor:pointer;border:none;

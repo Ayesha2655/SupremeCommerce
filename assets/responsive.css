@@ -212,6 +212,48 @@ nav .wrap{ gap: 12px; }
     transition: opacity .4s ease;
   }
   .nav-scrim.open{ opacity: 1; pointer-events: auto; }
+
+  /* Services dropdown: inside the drawer there's no hover, so the
+     submenu is just shown inline under "Services" instead of the
+     desktop hover panel — no extra tap-to-expand step needed. */
+  .nav-item{ width: 100%; flex-direction: column; align-items: stretch; }
+  .dropdown-caret{ display: none; }
+  .dropdown-menu{
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    min-width: 0;
+    width: 100%;
+    padding: 0 0 6px 16px;
+    margin-top: -6px;
+  }
+  .dropdown-panel{
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    transform: none;
+  }
+  /* Redundant with the "Services" row itself right above this list. */
+  .dropdown-label{ display: none; }
+  /* Desktop hides these until :hover/:focus-within reveals them with
+     an entrance animation — there's no hover on a touch drawer, so
+     without this override the links would just stay invisible. */
+  .dropdown-menu a{
+    font-size: 14px;
+    color: var(--slate-dark);
+    padding: 9px 0 9px 12px;
+    border-bottom: none;
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .dropdown-menu a::before{ left: 0; }
+  .dropdown-menu a:hover{ background: transparent; color: var(--porcelain); padding-left: 12px; }
 }
 
 /* Below 600px the logo and the toggle couldn't share one row —
@@ -570,6 +612,8 @@ h1{ font-size: clamp(30px, 6.4vw, 64px); }
   .nav-links{ transition: none; }
   .nav-scrim{ transition: none; }
   html{ scroll-behavior: auto; }
+  .dropdown-panel{ transition: none; }
+  .dropdown-menu a{ animation: none !important; opacity: 1; transform: none; }
 }
 
 /* Keyboard focus must stay visible on every interactive element. */
